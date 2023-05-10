@@ -1,0 +1,15 @@
+---
+user_backend_default: yaml
+issuer: https://daps.example.com/auth
+front_url: https://daps.example.com/auth
+bind_to: 0.0.0.0:4567
+environment: development
+openid: true
+default_audience: idsc:IDS_CONNECTORS_ALL
+accept_audience: idsc:IDS_CONNECTORS_ALL
+access_token:
+  expiration: 3600
+  algorithm: RS256
+id_token:
+  expiration: 3600
+  algorithm: RS256

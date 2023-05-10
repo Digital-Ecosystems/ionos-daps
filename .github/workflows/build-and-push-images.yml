@@ -1,0 +1,94 @@
+name: Create and publish Docker images
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  REGISTRY: ghcr.io
+  NAMESPACE: digital-ecosystems
+
+jobs:
+  build-and-push-omejdn-daps-images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
+
+      - name: Prepare required files
+        run: cd ./docker && ./prepare.sh
+
+      - name: Docker "omejdn-ui" meta
+        id: omejdn-ui-meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-ui
+          tags: |
+            latest
+            ${{ github.sha }}
+
+      - name: Docker "omejdn-server" meta
+        id: omejdn-server-meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-server
+          tags: |
+            latest
+            ${{ github.sha }}
+      
+      - uses: sigstore/cosign-installer@main
+
+      - name: Write signing key to disk
+        run: echo "${{ secrets.SIGNING_SECRET }}" > cosign.key
+
+      - name: Build and push "omejdn-ui"
+        id: build_and_push_omejdn_ui
+        uses: docker/build-push-action@v4
+        with:
+          context: ./docker/temp/omejdn-ui
+          file: ./docker/omejdn-ui/Dockerfile
+          push: true
+          tags: ${{ steps.omejdn-ui-meta.outputs.tags }}
+          labels: ${{ steps.omejdn-ui-meta.outputs.labels }}
+      
+      - name: Build and push "omejdn-server"
+        id: build_and_push_omejdn_server
+        uses: docker/build-push-action@v4
+        with:
+          context: ./docker/temp/omejdn-server
+          file: ./docker/omejdn-server/Dockerfile
+          push: true
+          tags: ${{ steps.omejdn-server-meta.outputs.tags }}
+          labels: ${{ steps.omejdn-server-meta.outputs.labels }}
+
+      - name: Sign "omejdn-ui" image
+        run: |
+          cosign sign -y --key cosign.key \
+          ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-ui@${{ steps.build_and_push_omejdn_ui.outputs.digest }}
+        env:
+          COSIGN_PASSWORD: ${{ secrets.SIGNING_SECRET_PASSWORD }}
+    
+      - name: Sign "omejdn-server" image
+        run: |
+          cosign sign -y --key cosign.key \
+          ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-server@${{ steps.build_and_push_omejdn_server.outputs.digest }}
+        env:
+          COSIGN_PASSWORD: ${{ secrets.SIGNING_SECRET_PASSWORD }}

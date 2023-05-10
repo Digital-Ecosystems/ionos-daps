@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx-conf
+data:
+  default.conf: |
+    server {
+    listen              80 default_server;
+    listen              [::]:80 default_server ;
+    server_name         {{ .Values.nginx.domain}};
+
+    proxy_set_header   Host $host;
+    proxy_set_header   X-Forwarded-Proto http;
+
+    # Proxy to Omejdn
+    location  {{ .Values.nginx.path }} {
+        rewrite {{ .Values.nginx.path }}/(.*) /$1  break;
+        proxy_pass         {{ .Values.nginx.serverAddress }};
+        proxy_set_header Host $host;
+        proxy_ssl_name $host;
+
+        proxy_redirect     off;
+    }
+
+    # Proxy to the Admin UI
+    location  /{{ .Values.nginx.uiPath }} {
+        rewrite {{ .Values.nginx.uiPath }}/(.*) /$1  break;
+        proxy_pass         {{ .Values.nginx.uiAddress }};
+        proxy_redirect     off;
+    }
+
+    #  Well-Known URIs
+    location /.well-known {
+        # RFC 8414 style metadata document and compatibility backup
+        rewrite /\.well-known/oauth-authorization-server{{ .Values.nginx.path }} {{ .Values.nginx.path }}/.well-known/oauth-authorization-server last;
+        rewrite /\.well-known/openid-configuration{{ .Values.nginx.path }}       {{ .Values.nginx.path }}/.well-known/openid-configuration       last;
+
+        # Webfinger
+        rewrite /\.well-known/webfinger                                {{ .Values.nginx.path }}/.well-known/webfinger                  last;
+
+        # Fix for old connectors
+        rewrite /\.well-known/jwks.json                                {{ .Values.nginx.path }}/jwks.json                              last;
+    }
+    }

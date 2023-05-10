@@ -1,0 +1,14 @@
+---
+- username: testUser
+  attributes:
+    omejdn: write
+    openid: true
+    profile: true
+    email: admin@example.com
+    asdfasf: asdfasf
+    exampleKey: exampleValue
+  password: "$2a$12$s1UhO7bRO9b5fTTiRE4KxOR88vz3462Bxn8DGh/iDX26Neh95AHrC" # mypassword
+  backend: yaml
+  consent:
+    adminUI:
+    - openid
