@@ -32,8 +32,8 @@ go install github.com/sigstore/cosign/v2/cmd/cosign@v2.0.0
 
 # verify the images
 cd ../
-cosign verify --key ./docker/image.pub ghcr.io/ionos-daps/omejdn-ui:latest
-cosign verify --key ./docker/image.pub ghcr.io/ionos-daps/omejdn-server:latest
+cosign verify --key ./docker/image.pub ghcr.io/digital-ecosystems/omejdn-ui:latest
+cosign verify --key ./docker/image.pub ghcr.io/digital-ecosystems/omejdn-server:latest
 ```
 
 ### For manual build and push to docker registry

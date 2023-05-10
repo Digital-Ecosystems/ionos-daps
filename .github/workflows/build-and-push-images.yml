@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  NAMESPACE: ionos-daps
+  NAMESPACE: digital-ecosystems
 
 jobs:
   build-and-push-omejdn-daps-images:
