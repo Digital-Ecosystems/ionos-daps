@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/fraunhofer-aisec/omejdn-server
+  repository: ghcr.io/digital-ecosystems/ionos-daps/omejdn-server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.7.0"
