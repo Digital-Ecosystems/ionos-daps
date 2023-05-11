@@ -2,7 +2,7 @@ FROM ruby:3
 ARG omejdn_version="unknown"
 
 # Create container user
-RUN groupadd -r containerUser && useradd -r -m -g containerUser containerUser
+# RUN groupadd -r containerUser && useradd -r -m -g containerUser containerUser
 
 WORKDIR /opt
 
@@ -17,6 +17,6 @@ COPY . .
 EXPOSE 4567
 
 # Change current user
-USER containerUser
+# USER containerUser
 
 CMD [ "ruby", "omejdn.rb" ]

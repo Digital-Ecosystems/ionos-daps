@@ -13,4 +13,5 @@ fi
 # Clone code repository in temporary directory
 mkdir temp
 git clone https://github.com/International-Data-Spaces-Association/omejdn-daps ./temp --recurse-submodules
-
+cd temp/omejdn-server
+git checkout v1.7.0

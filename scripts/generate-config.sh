@@ -13,7 +13,7 @@ mkdir -p ./config
 
 for file in ./config-templates/*; do
     filename=$(basename $file)
-    sed "s/daps.example.com/$TF_VAR_domain/g" $file > ./config/$filename
+    sed "s/daps.example.com/daps.$TF_VAR_domain/g" $file > ./config/$filename
 done
 
 echo "Configuration files generated successfully."

@@ -17,11 +17,11 @@ resource "helm_release" "omejdn-server" {
 
   set {
     name  = "omejdn.issuer"
-    value = "https://daps.$var.domain}/auth"
+    value = "https://daps.${var.domain}/auth"
   }
   set {
     name  = "omejdn.frontUrl"
-    value = "https://daps.$var.domain}/auth"
+    value = "https://daps.${var.domain}/auth"
   }
 }
 
@@ -40,7 +40,7 @@ resource "helm_release" "omejdn-ui" {
 
   set {
     name  = "omejdn.issuer"
-    value = "https://daps.$var.domain}/auth"
+    value = "https://daps.${var.domain}/auth"
   }
 }
 
@@ -60,14 +60,14 @@ resource "helm_release" "omejdn-nginx" {
 
   set {
     name  = "nginx.domain"
-    value = "daps.$var.domain}"
+    value = "daps.${var.domain}"
   }
   set {
     name  = "ingress.hosts[0].host"
-    value = "daps.$var.domain}"
+    value = "daps.${var.domain}"
   }
   set {
     name  = "ingress.tls[0].hosts[0]"
-    value = "daps.$var.domain}"
+    value = "daps.${var.domain}"
   }
 }

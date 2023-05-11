@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z `printenv TF_VAR_kubeconfig` ]; then
+    echo "Stopping because TF_VAR_kubeconfig is undefined"
+    exit 1
+fi
+
 if [ -z `printenv TF_VAR_domain` ]; then
     echo "Stopping because TF_VAR_domain is undefined"
     exit 1

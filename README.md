@@ -46,13 +46,64 @@ cp .env-template .env
 source .env
 ```
 
-### 3. Install the DAPS services
+### 3. Install and configure `external-dns` (Optional)
+
+Skip this step if you want to use Ionos DNS service.
+
+
+If you already have a Kubernetes cluster and have skipped step1 of this deployment procedure, you must configure the path to the KUBECONFIG like so:
+```sh
+export TF_VAR_kubeconfig="/path/to/kubeconfig"
+```
+
+and set ```USE_IONOS_DNS``` variable to False:
+```sh
+export USE_IONOS_DNS=False
+```
+
+Return to the ```omejdn-daps``` directory
+
+```sh
+cd ../omejdn-daps
+```
+
+To install the DNS service you must first create secret containing service account credentials for one of the providers ( AWS, GCP, Azure, ... ) and configure it in the values file - ```../helm/external-dns/values.yaml```. After that install the service with helm.
+
+```sh
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm install -n external-dns external-dns bitnami/external-dns -f ../helm/external-dns/values.yaml --create-namespace --version 6.14.1
+
+# wait for external-dns POD to become ready
+kubectl wait pods -n external-dns -l app.kubernetes.io/name=external-dns --for condition=Ready --timeout=300s
+```
+
+### 4. Use Ionos DNS service (Optional)
+
+In order to use the DNS service, you should have skipped step 2 and you will need NS record pointing to Ionos name servers
+
+```
+ns-ic.ui-dns.com
+ns-ic.ui-dns.de
+ns-ic.ui-dns.org
+ns-ic.ui-dns.biz
+```
+
+You will also need to set ```USE_IONOS_DNS``` variable to True:
+```sh
+export USE_IONOS_DNS=True
+```
+If you have DNS zone already configured set ```IONOS_DNS_ZONE_ID``` environment variable.
+
+### 5. Install the DAPS services
 
 To install DAPS services, run the script `install-services.sh` located in the `terraform` directory.
 
 ```sh
 # Install DAPS
-./terraform/install-services.sh
+cd ./terraform
+./install-services.sh
+cd ../
 
 # Generate the configuration from the ./config-template directory and store it in the ./config directory
 ./scripts/generate-config.sh
@@ -61,7 +112,7 @@ To install DAPS services, run the script `install-services.sh` located in the `t
 ./scripts/deploy-config.sh
 ```
 
-### 4. Retrieve the `token_endpoint` and `jwks_uri` from the metadata URL
+### 6. Retrieve the `token_endpoint` and `jwks_uri` from the metadata URL
 This step autogenerates the server private key. Run the following command:
 
 ```sh
@@ -69,7 +120,7 @@ OMEJDN_NGINX_POD_NAME=$(kubectl get pods --namespace omejdn-daps -l "app.kuberne
 kubectl exec -it $OMEJDN_NGINX_POD_NAME --namespace omejdn-daps -- curl http://localhost/.well-known/oauth-authorization-server/auth|jq '.token_endpoint, .jwks_uri'
 ```
 
-### 5. Get the DAPS URL
+### 7. Get the DAPS URL
 Run the following command to get the DAPS URL:
 
 ```sh
@@ -104,5 +155,7 @@ To remove the DAPS services, run the script `destroy-services.sh` located in the
 
 ```sh
 # Destroy DAPS
-./terraform/destroy-services.sh
+cd ./terraform
+./destroy-services.sh
+cd ../
 ```

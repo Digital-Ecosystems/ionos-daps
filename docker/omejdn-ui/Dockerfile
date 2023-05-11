@@ -22,7 +22,7 @@ RUN ng build --configuration production
 FROM nginx
 
 # Create container user
-RUN groupadd -r containerUser && useradd -r -m -g containerUser containerUser
+# RUN groupadd -r containerUser && useradd -r -m -g containerUser containerUser
 
 WORKDIR /opt
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -33,7 +33,7 @@ COPY ./src/assets ./assets
 ENV CLIENT_ID=adminUI
 
 # Change current user
-USER containerUser
+# USER containerUser
 
 EXPOSE 80
 ENTRYPOINT ["/bin/bash", "./docker-entrypoint.sh"]
