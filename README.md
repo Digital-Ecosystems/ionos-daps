@@ -1,3 +1,5 @@
+[![Create and publish Docker images](https://github.com/Digital-Ecosystems/ionos-daps/actions/workflows/build-and-push-images.yml/badge.svg)](https://github.com/Digital-Ecosystems/ionos-daps/actions/workflows/build-and-push-images.yml)
+
 ***
 # DAPS deployment
 
