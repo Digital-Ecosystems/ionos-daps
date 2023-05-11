@@ -63,22 +63,7 @@ and set ```USE_IONOS_DNS``` variable to False:
 export USE_IONOS_DNS=False
 ```
 
-Return to the ```omejdn-daps``` directory
-
-```sh
-cd ../omejdn-daps
-```
-
-To install the DNS service you must first create secret containing service account credentials for one of the providers ( AWS, GCP, Azure, ... ) and configure it in the values file - ```../helm/external-dns/values.yaml```. After that install the service with helm.
-
-```sh
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
-helm install -n external-dns external-dns bitnami/external-dns -f ../helm/external-dns/values.yaml --create-namespace --version 6.14.1
-
-# wait for external-dns POD to become ready
-kubectl wait pods -n external-dns -l app.kubernetes.io/name=external-dns --for condition=Ready --timeout=300s
-```
+Follow [these instructions](https://github.com/Digital-Ecosystems/ionos-kubernetes-cluster) for **external-dns**.
 
 ### 4. Use Ionos DNS service (Optional)
 
