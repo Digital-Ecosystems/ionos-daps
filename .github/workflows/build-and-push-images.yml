@@ -42,7 +42,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-ui
           tags: |
-            latest
+            type=raw,value=latest,enable={{is_default_branch}}
             ${{ github.sha }}
 
       - name: Docker "omejdn-server" meta
@@ -51,7 +51,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-server
           tags: |
-            latest
+            type=raw,value=latest,enable={{is_default_branch}}
             ${{ github.sha }}
       
       - uses: sigstore/cosign-installer@main
