@@ -2,9 +2,9 @@ name: Create and publish Docker images
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   REGISTRY: ghcr.io
@@ -42,7 +42,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-ui
           tags: |
-            latest
+            type=raw,value=latest,enable={{is_default_branch}}
             ${{ github.sha }}
 
       - name: Docker "omejdn-server" meta
@@ -51,9 +51,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-server
           tags: |
-            latest
+            type=raw,value=latest,enable={{is_default_branch}}
             ${{ github.sha }}
-      
+
       - uses: sigstore/cosign-installer@main
 
       - name: Write signing key to disk
@@ -68,7 +68,7 @@ jobs:
           push: true
           tags: ${{ steps.omejdn-ui-meta.outputs.tags }}
           labels: ${{ steps.omejdn-ui-meta.outputs.labels }}
-      
+
       - name: Build and push "omejdn-server"
         id: build_and_push_omejdn_server
         uses: docker/build-push-action@v4
@@ -85,7 +85,7 @@ jobs:
           ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/omejdn-ui@${{ steps.build_and_push_omejdn_ui.outputs.digest }}
         env:
           COSIGN_PASSWORD: ${{ secrets.SIGNING_SECRET_PASSWORD }}
-    
+
       - name: Sign "omejdn-server" image
         run: |
           cosign sign -y --key cosign.key \
